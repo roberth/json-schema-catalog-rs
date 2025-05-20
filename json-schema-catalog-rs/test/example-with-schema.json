@@ -1,0 +1,16 @@
+{
+  "$schema": "https://schema.example.com/schema/schema_catalog_schema.json",
+  "name": "Example Catalog",
+  "groups": [
+    {
+      "name": "json-schema-catalog-rs",
+      "baseLocation": "../vendor",
+      "schemas": [
+        {
+          "id": "https://schema.example.com/schema/schema_catalog_schema.json",
+          "location": "schema_catalog_schema.json"
+        }
+      ]
+    }
+  ]
+}

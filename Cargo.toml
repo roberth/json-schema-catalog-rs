@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "json-schema-catalog-rs",
+]
+resolver = "2"

@@ -25,7 +25,7 @@
                   "type": "string"
                 },
                 "location": {
-                  "location": "string"
+                  "type": "string"
                 }
               },
               "additionalProperties": false,
@@ -40,7 +40,7 @@
         "required": [
           "baseLocation",
           "name",
-          "schema"
+          "schemas"
         ]
       }
     }
@@ -48,6 +48,6 @@
   "additionalProperties": false,
   "required": [
     "name",
-    "group"
+    "groups"
   ]
 }
