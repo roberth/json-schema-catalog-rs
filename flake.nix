@@ -31,6 +31,14 @@
         # export the release package of the crate as default package
         packages.default = crateOutputs.packages.release;
 
+        checks = import ./pkgs-lib-tests.nix {
+          inherit pkgs;
+          jsonSchemaCatalogLib = import ./pkgs-lib.nix {
+            inherit pkgs;
+            json-schema-catalog-rs = config.packages.default;
+          };
+        };
+
         # nix-cargo-integration:
         # https://flake.parts/options/nix-cargo-integration
         # https://github.com/yusdacra/nix-cargo-integration#readme
@@ -39,6 +47,10 @@
         nci.projects."json-schema-catalog-rs".path = ./.;
         # configure crates
         nci.crates."json-schema-catalog-rs" = {};
+      };
+
+      flake.lib = {
+        withPkgs = { pkgs, ... }: import ./pkgs-lib.nix { inherit pkgs; };
       };
     };
 }
