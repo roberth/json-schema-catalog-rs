@@ -82,15 +82,16 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1747284884,
-        "narHash": "sha256-lTSKhRrassMcJ1ZsuUVunyl/F04vvCKY80HB/4rvvm4=",
+        "lastModified": 1747840120,
+        "narHash": "sha256-IXg93gAwG/EQgjAaBj0MxZMTkAsGnH8YwsaZPx5lojI=",
         "owner": "hercules-ci",
         "repo": "hercules-ci-effects",
-        "rev": "7168f6002a6b48a9b6151e1e97e974a0722ecfdc",
+        "rev": "3699261e559b4abbb796e77df2c815c6bd463a07",
         "type": "github"
       },
       "original": {
         "owner": "hercules-ci",
+        "ref": "cargo-publish-module",
         "repo": "hercules-ci-effects",
         "type": "github"
       }

@@ -4,7 +4,7 @@
   inputs.nci.inputs.nixpkgs.follows = "nixpkgs";
   inputs.parts.url = "github:hercules-ci/flake-parts";
   inputs.parts.inputs.nixpkgs-lib.follows = "nixpkgs";
-  inputs.hercules-ci-effects.url = "github:hercules-ci/hercules-ci-effects";
+  inputs.hercules-ci-effects.url = "github:hercules-ci/hercules-ci-effects/cargo-publish-module";
 
   outputs = inputs @ {
     parts,
@@ -59,6 +59,12 @@
       hercules-ci.flake-update.enable = true;
       hercules-ci.flake-update.autoMergeMethod = "merge";
       hercules-ci.flake-update.when.dayOfMonth = 10;
+
+      hercules-ci.cargo-publish = {
+        enable = true;
+        secretName = "crates.io";
+        packageName = "json-schema-catalog-rs";
+      };
 
       # https://flake.parts/options/hercules-ci-effects.html#opt-herculesCI
       herculesCI = { ... }: {
