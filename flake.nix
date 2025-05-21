@@ -4,6 +4,7 @@
   inputs.nci.inputs.nixpkgs.follows = "nixpkgs";
   inputs.parts.url = "github:hercules-ci/flake-parts";
   inputs.parts.inputs.nixpkgs-lib.follows = "nixpkgs";
+  inputs.hercules-ci-effects.url = "github:hercules-ci/hercules-ci-effects";
 
   outputs = inputs @ {
     parts,
@@ -11,9 +12,10 @@
     ...
   }:
     parts.lib.mkFlake {inherit inputs;} {
-      systems = ["x86_64-linux"];
+      systems = inputs.nixpkgs.lib.systems.flakeExposed;
       imports = [
         nci.flakeModule
+        inputs.hercules-ci-effects.flakeModule
       ];
       perSystem = {
         pkgs,
@@ -31,6 +33,14 @@
         # export the release package of the crate as default package
         packages.default = crateOutputs.packages.release;
 
+        checks = import ./pkgs-lib-tests.nix {
+          inherit pkgs;
+          jsonSchemaCatalogLib = import ./pkgs-lib.nix {
+            inherit pkgs;
+            json-schema-catalog-rs = config.packages.default;
+          };
+        };
+
         # nix-cargo-integration:
         # https://flake.parts/options/nix-cargo-integration
         # https://github.com/yusdacra/nix-cargo-integration#readme
@@ -39,6 +49,20 @@
         nci.projects."json-schema-catalog-rs".path = ./.;
         # configure crates
         nci.crates."json-schema-catalog-rs" = {};
+      };
+
+      flake.lib = {
+        withPkgs = { pkgs, ... }: import ./pkgs-lib.nix { inherit pkgs; };
+      };
+
+      # https://flake.parts/options/hercules-ci-effects.html#opt-hercules-ci.flake-update.enable
+      hercules-ci.flake-update.enable = true;
+      hercules-ci.flake-update.autoMergeMethod = "merge";
+      hercules-ci.flake-update.when.dayOfMonth = 10;
+
+      # https://flake.parts/options/hercules-ci-effects.html#opt-herculesCI
+      herculesCI = { ... }: {
+        ciSystems = [ "x86_64-linux" ];
       };
     };
 }
