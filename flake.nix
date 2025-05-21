@@ -18,6 +18,7 @@
         inputs.hercules-ci-effects.flakeModule
       ];
       perSystem = {
+        lib,
         pkgs,
         config,
         ...
@@ -46,7 +47,17 @@
         # https://github.com/yusdacra/nix-cargo-integration#readme
 
         # declare projects
-        nci.projects."json-schema-catalog-rs".path = ./.;
+        nci.projects."json-schema-catalog-rs".path =
+          with lib.fileset;
+          toSource {
+            root = ./.;
+            fileset = unions [
+              ./README.md
+              ./Cargo.lock
+              ./Cargo.toml
+              ./json-schema-catalog-rs
+            ];
+          };
         # configure crates
         nci.crates."json-schema-catalog-rs" = {};
       };
