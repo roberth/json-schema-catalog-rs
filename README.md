@@ -1,3 +1,4 @@
+[![Hercules CI](https://hercules-ci.com/api/v1/site/github/account/roberth/project/json-schema-catalog-rs/badge)](https://hercules-ci.com/github/roberth/json-schema-catalog-rs/status)
 
 `json-schema-catalog-rs` provides Rust-based tooling around the de facto JSON Schema Catalog standard
 

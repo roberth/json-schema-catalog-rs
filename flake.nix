@@ -4,6 +4,7 @@
   inputs.nci.inputs.nixpkgs.follows = "nixpkgs";
   inputs.parts.url = "github:hercules-ci/flake-parts";
   inputs.parts.inputs.nixpkgs-lib.follows = "nixpkgs";
+  inputs.hercules-ci-effects.url = "github:hercules-ci/hercules-ci-effects";
 
   outputs = inputs @ {
     parts,
@@ -11,9 +12,10 @@
     ...
   }:
     parts.lib.mkFlake {inherit inputs;} {
-      systems = ["x86_64-linux"];
+      systems = inputs.nixpkgs.lib.systems.flakeExposed;
       imports = [
         nci.flakeModule
+        inputs.hercules-ci-effects.flakeModule
       ];
       perSystem = {
         pkgs,
@@ -51,6 +53,16 @@
 
       flake.lib = {
         withPkgs = { pkgs, ... }: import ./pkgs-lib.nix { inherit pkgs; };
+      };
+
+      # https://flake.parts/options/hercules-ci-effects.html#opt-hercules-ci.flake-update.enable
+      hercules-ci.flake-update.enable = true;
+      hercules-ci.flake-update.autoMergeMethod = "merge";
+      hercules-ci.flake-update.when.dayOfMonth = 10;
+
+      # https://flake.parts/options/hercules-ci-effects.html#opt-herculesCI
+      herculesCI = { ... }: {
+        ciSystems = [ "x86_64-linux" ];
       };
     };
 }
