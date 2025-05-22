@@ -171,6 +171,9 @@ pub fn group_from_schema(file: &str, schema: &serde_json::Value) -> Result<Catal
     let base_dir = std::path::Path::new(file)
         .parent()
         .ok_or_else(|| anyhow::format_err!("Could not get parent directory of {}", file))?;
+    let file_name = std::path::Path::new(file)
+        .file_name()
+        .ok_or_else(|| anyhow::format_err!("Could not get file name from {}", file))?;
     let name = schema
         .schema
         .metadata
@@ -183,7 +186,7 @@ pub fn group_from_schema(file: &str, schema: &serde_json::Value) -> Result<Catal
         base_location: base_dir.to_string_lossy().to_string(),
         schemas: vec![Schema {
             id,
-            location: file.to_string(),
+            location: file_name.to_string_lossy().to_string(),
         }],
     })
 }
@@ -345,11 +348,11 @@ mod tests {
                         schemas: vec![
                             Schema {
                                 id: "https://schema.example.com/schema/A.json".to_string(),
-                                location: "test/example.json".to_string()
+                                location: "example.json".to_string()
                             },
                             Schema {
                                 id: "https://schema.example.com/schema/B.json".to_string(),
-                                location: "test/example.json".to_string()
+                                location: "example.json".to_string()
                             }
                         ]
                     },
@@ -358,7 +361,7 @@ mod tests {
                         name: "Catalog Cee".to_string(),
                         schemas: vec![Schema {
                             id: "https://schema.example.com/schema/C/B.json".to_string(),
-                            location: "test/cb.json".to_string()
+                            location: "cb.json".to_string()
                         }]
                     },
                     CatalogGroup {
@@ -366,7 +369,7 @@ mod tests {
                         name: "Catalog C".to_string(),
                         schemas: vec![Schema {
                             id: "https://schema.example.com/schema/C/A.json".to_string(),
-                            location: "test/c/a.json".to_string()
+                            location: "a.json".to_string()
                         }]
                     },
                     CatalogGroup {
@@ -374,7 +377,7 @@ mod tests {
                         name: "Catalog".to_string(),
                         schemas: vec![Schema {
                             id: "https://schema.example.com/schema/D.json".to_string(),
-                            location: "test/dee/example.json".to_string()
+                            location: "example.json".to_string()
                         }]
                     }
                 ],
