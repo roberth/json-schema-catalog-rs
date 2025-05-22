@@ -2,6 +2,22 @@ use anyhow::{bail, Context as _, Ok, Result};
 use schemars::schema::RootSchema;
 use std::path::Path;
 
+pub struct CheckOptions {
+    pub require_matching_id: bool,
+}
+impl CheckOptions {
+    pub fn new() -> Self {
+        CheckOptions {
+            require_matching_id: true,
+        }
+    }
+}
+impl Default for CheckOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 include!(concat!(env!("OUT_DIR"), "/generated/example.com"));
 
 impl Catalog {
@@ -42,22 +58,6 @@ impl CatalogGroup {
         }
     }
 }
-pub struct CheckOptions {
-    pub require_matching_id: bool,
-}
-impl CheckOptions {
-    pub fn new() -> Self {
-        CheckOptions {
-            require_matching_id: true,
-        }
-    }
-}
-impl Default for CheckOptions {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl Schema {
     pub fn check(&self, opts: &CheckOptions, base_dir: &Path) -> Result<()> {
         if self.id.is_empty() {
@@ -142,6 +142,9 @@ impl IndexEntry {
     }
 }
 
+/// An index for looking up schema files by their id.
+///
+/// The index is filled by calling the `index` method on a `Catalog`, `CatalogGroup` or `Schema`.
 pub struct Index {
     by_id: std::collections::HashMap<String, IndexEntry>,
 }
@@ -160,6 +163,7 @@ impl Index {
     }
 }
 
+/// Generate a singleton group from a schema file.
 pub fn group_from_schema(file: &str, schema: &serde_json::Value) -> Result<CatalogGroup> {
     let schema = serde_json::from_value::<RootSchema>(schema.clone())?;
     let id = schema
@@ -195,6 +199,8 @@ fn group_key(group: &CatalogGroup) -> (String, String) {
     (group.base_location.clone(), group.name.clone())
 }
 
+/// Merge groups into a single catalog. Groups with matching base_location and name
+/// are merged into a single group.
 pub fn catalog_from_groups(name: String, groups: Vec<CatalogGroup>) -> Result<Catalog> {
     let mut groups = groups.clone();
     groups.sort_by_key(group_key);
