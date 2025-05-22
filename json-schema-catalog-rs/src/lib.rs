@@ -167,9 +167,7 @@ pub fn group_from_schema(file: &str, schema: &serde_json::Value) -> Result<Catal
         .metadata
         .as_ref()
         .and_then(|m| m.id.clone())
-        .ok_or_else(|| {
-            anyhow::format_err!("Schema {} does not have an $id field", file)
-        })?;
+        .ok_or_else(|| anyhow::format_err!("Schema {} does not have an $id field", file))?;
     let base_dir = std::path::Path::new(file)
         .parent()
         .ok_or_else(|| anyhow::format_err!("Could not get parent directory of {}", file))?;

@@ -232,16 +232,11 @@ struct NewCommand {
 
     /// Set the name of the schema group not to the individual schema file titles,
     /// so that they can be grouped together.
-    #[arg(
-        long = "group-name"
-    )]
+    #[arg(long = "group-name")]
     group_name: Option<String>,
 
     /// Set the catalog name
-    #[arg(
-        long = "catalog-name",
-        default_value = "Catalog"
-    )]
+    #[arg(long = "catalog-name", default_value = "Catalog")]
     catalog_name: String,
 }
 impl NewCommand {
