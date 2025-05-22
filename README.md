@@ -1,6 +1,6 @@
 [![Hercules CI](https://hercules-ci.com/api/v1/site/github/account/roberth/project/json-schema-catalog-rs/badge)](https://hercules-ci.com/github/roberth/json-schema-catalog-rs/status)
 
-`json-schema-catalog-rs` provides Rust-based tooling around the de facto JSON Schema Catalog standard
+`json-schema-catalog-rs` provides Rust-based tooling around the de facto JSON Schema Catalog standard.
 
 # JSON Schema Catalog
 
@@ -24,10 +24,13 @@ Tea was consumed during this project's creation, fwiw.
 This crate provides a command line interface (CLI) for working with JSON Schema Catalogs.
 
 ```
+Usage: json-schema-catalog <COMMAND>
+
 Commands:
   check    Check a JSON schema catalog file for validity
   lookup   Look up a schema location by its id in a JSON schema catalog file
   replace  Replace "$ref", "$schema" occurrences in a JSON file with the corresponding physical file location
+  new      Create a new JSON Schema Catalog file from a set of JSON schema filesCommands:
 ```
 
 Example usage:
@@ -59,6 +62,16 @@ $ json-schema-catalog replace json-schema-catalog-rs/test/example-with-schema.js
   "name": "Example Catalog"
 }
 ```
+
+# Installation
+
+- **Nixpkgs**: attribute name [`json-schema-catalog-rs`](https://search.nixos.org/packages?show=json-schema-catalog-rs)
+
+- **Cargo**: `cargo install json-schema-catalog-rs`
+
+# Contributing
+
+Contributions are welcome, but open an issue, especially if you want to do something non-trivial.
 
 # `replace` is a stop-gap
 
