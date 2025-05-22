@@ -18,8 +18,12 @@ impl Default for CheckOptions {
     }
 }
 
-include!(concat!(env!("OUT_DIR"), "/generated/example.com"));
+include!(concat!(
+    env!("OUT_DIR"),
+    "/generated/schema_catalog_schema.rs"
+));
 
+// struct declared in generated file
 impl Catalog {
     pub fn check(&self, opts: &CheckOptions, file_name: &str) -> Result<()> {
         let base_dir = std::path::Path::new(file_name).parent().unwrap();
@@ -36,6 +40,7 @@ impl Catalog {
         }
     }
 }
+// struct declared in generated file
 impl CatalogGroup {
     pub fn check(&self, opts: &CheckOptions, base_dir: &Path) -> Result<()> {
         if self.name.is_empty() {
@@ -58,6 +63,7 @@ impl CatalogGroup {
         }
     }
 }
+// struct declared in generated file
 impl Schema {
     pub fn check(&self, opts: &CheckOptions, base_dir: &Path) -> Result<()> {
         if self.id.is_empty() {
