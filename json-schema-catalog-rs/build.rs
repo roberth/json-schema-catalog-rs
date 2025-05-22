@@ -5,7 +5,7 @@ fn main() {
     schema_to_rust(
         "vendor/schema_catalog_schema.json",
         "generated",
-        "example.com",
+        "schema_catalog_schema.rs",
     );
 }
 

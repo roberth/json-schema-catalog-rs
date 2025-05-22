@@ -4,8 +4,13 @@
   # Inputs
 
   - `pkgs`: A Nixpkgs instance, e.g. `import <nixpkgs> {}`.
- */
-{ pkgs, lib ? pkgs.lib, json-schema-catalog-rs, ... }:
+*/
+{
+  pkgs,
+  lib ? pkgs.lib,
+  json-schema-catalog-rs,
+  ...
+}:
 let
   jsonFormat = pkgs.formats.json { };
 in
@@ -13,7 +18,7 @@ in
   /**
     The `json-schema-catalog-rs` package to use, as configured when instantiating
     this library.
-   */
+  */
   inherit json-schema-catalog-rs;
 
   /**
@@ -38,33 +43,42 @@ in
       };
     }
     ```
-
   */
-  newCatalog = { name, displayName ? name, groups }:
-    pkgs.runCommand "catalog-${name}" {
-      catalogJson = builtins.toJSON {
-        name = displayName;
-        groups = lib.mapAttrsToList (name: group: {
-          inherit name;
-          # TODO dedup the longest common prefix by putting it in baseLocation
-          baseLocation = "/";
-          schemas = lib.mapAttrsToList (id: location: {
-            inherit id;
-            inherit location;
-          }) group;
-        }) groups;
-      };
-      passAsFile = ["catalogJson"];
-      passthru = {
-        inherit groups;
-      };
-      nativeBuildInputs = [ pkgs.jq json-schema-catalog-rs ];
-    } ''
-      out_dir="$out/share/json-schema-catalogs"
-      out_file="$out_dir/$name.json"
-      mkdir -p "$out_dir"
-      jq . <"$catalogJsonPath" >"$out_file"
-      json-schema-catalog check "$out_file"
-    '';
+  newCatalog =
+    {
+      name,
+      displayName ? name,
+      groups,
+    }:
+    pkgs.runCommand "catalog-${name}"
+      {
+        catalogJson = builtins.toJSON {
+          name = displayName;
+          groups = lib.mapAttrsToList (name: group: {
+            inherit name;
+            # TODO dedup the longest common prefix by putting it in baseLocation
+            baseLocation = "/";
+            schemas = lib.mapAttrsToList (id: location: {
+              inherit id;
+              inherit location;
+            }) group;
+          }) groups;
+        };
+        passAsFile = [ "catalogJson" ];
+        passthru = {
+          inherit groups;
+        };
+        nativeBuildInputs = [
+          pkgs.jq
+          json-schema-catalog-rs
+        ];
+      }
+      ''
+        out_dir="$out/share/json-schema-catalogs"
+        out_file="$out_dir/$name.json"
+        mkdir -p "$out_dir"
+        jq . <"$catalogJsonPath" >"$out_file"
+        json-schema-catalog check "$out_file"
+      '';
 
 }

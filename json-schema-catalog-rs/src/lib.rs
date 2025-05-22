@@ -2,8 +2,28 @@ use anyhow::{bail, Context as _, Ok, Result};
 use schemars::schema::RootSchema;
 use std::path::Path;
 
-include!(concat!(env!("OUT_DIR"), "/generated/example.com"));
+pub struct CheckOptions {
+    pub require_matching_id: bool,
+}
+impl CheckOptions {
+    pub fn new() -> Self {
+        CheckOptions {
+            require_matching_id: true,
+        }
+    }
+}
+impl Default for CheckOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
+include!(concat!(
+    env!("OUT_DIR"),
+    "/generated/schema_catalog_schema.rs"
+));
+
+// struct declared in generated file
 impl Catalog {
     pub fn check(&self, opts: &CheckOptions, file_name: &str) -> Result<()> {
         let base_dir = std::path::Path::new(file_name).parent().unwrap();
@@ -20,6 +40,7 @@ impl Catalog {
         }
     }
 }
+// struct declared in generated file
 impl CatalogGroup {
     pub fn check(&self, opts: &CheckOptions, base_dir: &Path) -> Result<()> {
         if self.name.is_empty() {
@@ -42,22 +63,7 @@ impl CatalogGroup {
         }
     }
 }
-pub struct CheckOptions {
-    pub require_matching_id: bool,
-}
-impl CheckOptions {
-    pub fn new() -> Self {
-        CheckOptions {
-            require_matching_id: true,
-        }
-    }
-}
-impl Default for CheckOptions {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
+// struct declared in generated file
 impl Schema {
     pub fn check(&self, opts: &CheckOptions, base_dir: &Path) -> Result<()> {
         if self.id.is_empty() {
@@ -142,6 +148,9 @@ impl IndexEntry {
     }
 }
 
+/// An index for looking up schema files by their id.
+///
+/// The index is filled by calling the `index` method on a `Catalog`, `CatalogGroup` or `Schema`.
 pub struct Index {
     by_id: std::collections::HashMap<String, IndexEntry>,
 }
@@ -160,6 +169,7 @@ impl Index {
     }
 }
 
+/// Generate a singleton group from a schema file.
 pub fn group_from_schema(file: &str, schema: &serde_json::Value) -> Result<CatalogGroup> {
     let schema = serde_json::from_value::<RootSchema>(schema.clone())?;
     let id = schema
@@ -167,12 +177,13 @@ pub fn group_from_schema(file: &str, schema: &serde_json::Value) -> Result<Catal
         .metadata
         .as_ref()
         .and_then(|m| m.id.clone())
-        .ok_or_else(|| {
-            anyhow::format_err!("Schema {} does not have an $id field", file)
-        })?;
+        .ok_or_else(|| anyhow::format_err!("Schema {} does not have an $id field", file))?;
     let base_dir = std::path::Path::new(file)
         .parent()
         .ok_or_else(|| anyhow::format_err!("Could not get parent directory of {}", file))?;
+    let file_name = std::path::Path::new(file)
+        .file_name()
+        .ok_or_else(|| anyhow::format_err!("Could not get file name from {}", file))?;
     let name = schema
         .schema
         .metadata
@@ -185,7 +196,7 @@ pub fn group_from_schema(file: &str, schema: &serde_json::Value) -> Result<Catal
         base_location: base_dir.to_string_lossy().to_string(),
         schemas: vec![Schema {
             id,
-            location: file.to_string(),
+            location: file_name.to_string_lossy().to_string(),
         }],
     })
 }
@@ -194,6 +205,8 @@ fn group_key(group: &CatalogGroup) -> (String, String) {
     (group.base_location.clone(), group.name.clone())
 }
 
+/// Merge groups into a single catalog. Groups with matching base_location and name
+/// are merged into a single group.
 pub fn catalog_from_groups(name: String, groups: Vec<CatalogGroup>) -> Result<Catalog> {
     let mut groups = groups.clone();
     groups.sort_by_key(group_key);
@@ -347,11 +360,11 @@ mod tests {
                         schemas: vec![
                             Schema {
                                 id: "https://schema.example.com/schema/A.json".to_string(),
-                                location: "test/example.json".to_string()
+                                location: "example.json".to_string()
                             },
                             Schema {
                                 id: "https://schema.example.com/schema/B.json".to_string(),
-                                location: "test/example.json".to_string()
+                                location: "example.json".to_string()
                             }
                         ]
                     },
@@ -360,7 +373,7 @@ mod tests {
                         name: "Catalog Cee".to_string(),
                         schemas: vec![Schema {
                             id: "https://schema.example.com/schema/C/B.json".to_string(),
-                            location: "test/cb.json".to_string()
+                            location: "cb.json".to_string()
                         }]
                     },
                     CatalogGroup {
@@ -368,7 +381,7 @@ mod tests {
                         name: "Catalog C".to_string(),
                         schemas: vec![Schema {
                             id: "https://schema.example.com/schema/C/A.json".to_string(),
-                            location: "test/c/a.json".to_string()
+                            location: "a.json".to_string()
                         }]
                     },
                     CatalogGroup {
@@ -376,7 +389,7 @@ mod tests {
                         name: "Catalog".to_string(),
                         schemas: vec![Schema {
                             id: "https://schema.example.com/schema/D.json".to_string(),
-                            location: "test/dee/example.json".to_string()
+                            location: "example.json".to_string()
                         }]
                     }
                 ],
