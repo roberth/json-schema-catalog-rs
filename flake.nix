@@ -5,6 +5,7 @@
   inputs.parts.url = "github:hercules-ci/flake-parts";
   inputs.parts.inputs.nixpkgs-lib.follows = "nixpkgs";
   inputs.hercules-ci-effects.url = "github:hercules-ci/hercules-ci-effects/cargo-publish-module";
+  inputs.git-hooks.url = "github:cachix/git-hooks.nix";
 
   outputs = inputs @ {
     parts,
@@ -16,6 +17,7 @@
       imports = [
         nci.flakeModule
         inputs.hercules-ci-effects.flakeModule
+        inputs.git-hooks.flakeModule
       ];
       perSystem = {
         lib,
@@ -30,6 +32,9 @@
         # export the crate devshell as the default devshell
         devShells.default = crateOutputs.devShell.overrideAttrs (prevAttrs: {
           nativeBuildInputs = prevAttrs.nativeBuildInputs;
+          shellHook = ''
+            ${config.pre-commit.installationScript}
+          '';
         });
         # export the release package of the crate as default package
         packages.default = crateOutputs.packages.release;
@@ -60,6 +65,9 @@
           };
         # configure crates
         nci.crates."json-schema-catalog-rs" = {};
+
+        pre-commit.settings.hooks.rustfmt.enable = true;
+        pre-commit.settings.hooks.nixfmt-rfc-style.enable = true;
       };
 
       flake.lib = {
