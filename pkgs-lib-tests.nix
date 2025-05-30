@@ -36,6 +36,9 @@ rec {
           "type": "object",
           "oneOf": [
             {
+              "$ref": "https://json-schema.org/draft-07/schema#"
+            },
+            {
               "$ref": "https://json-schema.org/draft-07/schema#/definitions/yolo"
             },
             {
@@ -47,10 +50,13 @@ rec {
         cat >example.json.expected <<"EOF"
         {
           "$id": "https://example.com/schemas/integration-test.json",
-          "$schema": "file://${
-            exampleCatalog.groups."JSON Schema"."https://json-schema.org/draft-07/schema#"
-          }#",
+          "$schema": "https://json-schema.org/draft-07/schema#",
           "oneOf": [
+            {
+              "$ref": "file://${
+                exampleCatalog.groups."JSON Schema"."https://json-schema.org/draft-07/schema#"
+              }#"
+            },
             {
               "$ref": "file://${
                 exampleCatalog.groups."JSON Schema"."https://json-schema.org/draft-07/schema#"
@@ -64,6 +70,9 @@ rec {
           "type": "object"
         }
         EOF
+        ( set -x;
+          ! grep '##' example.json.expected
+        )
 
         json-schema-catalog replace --verbose example.json > example.json.out
 

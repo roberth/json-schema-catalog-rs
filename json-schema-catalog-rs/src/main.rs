@@ -171,7 +171,7 @@ impl ReplaceCommand {
         match value {
             serde_json::Value::Object(map) => {
                 for (key, value) in map.iter_mut() {
-                    if key == "$ref" || key == "$schema" {
+                    if key == "$ref" {
                         let value_str = value.as_str().ok_or_else(|| {
                             anyhow::anyhow!(
                                 "Expected string value for {}, but got {:?}",
