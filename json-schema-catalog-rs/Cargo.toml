@@ -1,6 +1,6 @@
 [package]
 name = "json-schema-catalog-rs"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 description = "A tool for managing JSON Schema catalogs as defined by https://github.com/hmcts/cp-framework-libraries/blob/main/json-schema-catalog/catalog-core/src/main/resources/schema_catalog_schema.json"
 license = "Apache-2.0"
