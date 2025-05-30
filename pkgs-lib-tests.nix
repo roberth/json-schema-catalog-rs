@@ -33,17 +33,46 @@ rec {
           "$id": "https://example.com/schemas/integration-test.json",
           "$schema": "https://json-schema.org/draft-07/schema#",
           "title": "Integration Test",
-          "type": "object"
+          "type": "object",
+          "oneOf": [
+            {
+              "$ref": "https://json-schema.org/draft-07/schema#"
+            },
+            {
+              "$ref": "https://json-schema.org/draft-07/schema#/definitions/yolo"
+            },
+            {
+              "$ref": "./foo.json#/definitions/bar"
+            }
+          ]
         }
         EOF
         cat >example.json.expected <<"EOF"
         {
           "$id": "https://example.com/schemas/integration-test.json",
-          "$schema": "${exampleCatalog.groups."JSON Schema"."https://json-schema.org/draft-07/schema#"}",
+          "$schema": "https://json-schema.org/draft-07/schema#",
+          "oneOf": [
+            {
+              "$ref": "file://${
+                exampleCatalog.groups."JSON Schema"."https://json-schema.org/draft-07/schema#"
+              }#"
+            },
+            {
+              "$ref": "file://${
+                exampleCatalog.groups."JSON Schema"."https://json-schema.org/draft-07/schema#"
+              }#/definitions/yolo"
+            },
+            {
+              "$ref": "./foo.json#/definitions/bar"
+            }
+          ],
           "title": "Integration Test",
           "type": "object"
         }
         EOF
+        ( set -x;
+          ! grep '##' example.json.expected
+        )
 
         json-schema-catalog replace --verbose example.json > example.json.out
 

@@ -171,19 +171,67 @@ impl ReplaceCommand {
         match value {
             serde_json::Value::Object(map) => {
                 for (key, value) in map.iter_mut() {
-                    if key == "$ref" || key == "$schema" {
-                        match context.index.get_path(value.as_str().unwrap()) {
-                            Some(path) => {
+                    if key == "$ref" {
+                        let value_str = value.as_str().ok_or_else(|| {
+                            anyhow::anyhow!(
+                                "Expected string value for {}, but got {:?}",
+                                key,
+                                value
+                            )
+                        })?;
+                        let base_url = url::Url::parse("file:///")
+                            .with_context(|| "Failed to parse base URL for file scheme")?;
+
+                        let url: url::Url = url::Url::options()
+                            .base_url(Some(&base_url))
+                            .parse(value_str)
+                            .with_context(|| format!("Failed to parse URI: {}", value_str))?;
+
+                        let lookup_result = {
+                            let mut schema_url = url.clone();
+                            schema_url.set_fragment(Some(""));
+                            context.index.get_path(schema_url.as_str()).or_else(|| {
+                                // Maybe the # was forgotten, in either the reference or the catalog
+                                match schema_url.fragment() {
+                                    Some("") => {
+                                        schema_url.set_fragment(None);
+                                    }
+                                    None {} => {
+                                        schema_url.set_fragment(Some(""));
+                                    }
+                                    _ => {}
+                                }
+                                context.index.get_path(schema_url.as_str())
+                            })
+                        };
+
+                        match lookup_result {
+                            Some(location) => {
+                                let mut location_url = url::Url::from_file_path(&location)
+                                    .map_err(|()| {
+                                        anyhow::format_err!(
+                                            "Failed to convert catalog path to URL: {}",
+                                            &location
+                                        )
+                                    })?;
+
+                                location_url.set_fragment(url.fragment());
+
+                                let location_str = location_url.as_str();
+
                                 if self.verbose {
                                     eprintln!(
                                         "Replacing {} field, old: {} new: {}",
-                                        key, value, path
+                                        key, value, location_str
                                     );
                                 }
-                                *value = serde_json::Value::String(path);
+
+                                *value = serde_json::Value::String(location_str.to_string());
                             }
                             None {} => {
-                                if !self.ignore_unknown {
+                                if url.scheme() == "file" {
+                                    // already local, great!
+                                } else if !self.ignore_unknown {
                                     status = Err(anyhow::format_err!(
                                         "Could not find schema with id {}",
                                         value.as_str().unwrap()
