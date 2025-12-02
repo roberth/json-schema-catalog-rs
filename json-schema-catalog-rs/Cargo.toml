@@ -9,14 +9,14 @@ repository = "https://github.com/roberth/json-schema-catalog-rs"
 keywords = ["json", "schema", "catalog", "json-schema", "catalog"]
 
 [dependencies]
-anyhow = "1.0.98"
-clap = { version = "4.5.38", features = ["derive"] }
-json_schema = "1.7.5"
-schemars = "0.8.22"
-serde = "1.0.219"
-serde_json = "1.0.140"
-url = "2.5.4"
-xdg = "3.0.0"
+anyhow = "1.0"
+clap = { version = "4.5", features = ["derive"] }
+json_schema = "1.7"
+schemars = "0.8"
+serde = "1.0"
+serde_json = "1.0"
+url = "2.5"
+xdg = "3.0"
 
 
 [dev-dependencies]
@@ -24,11 +24,11 @@ xdg = "3.0.0"
 [lib]
 
 [build-dependencies]
-prettyplease = "0.2.32"
-schemars = "0.8.22"
-serde_json = "1.0.140"
-syn = "2.0.101"
-typify = "0.4.1"
+prettyplease = "0.2"
+schemars = "0.8"
+serde_json = "1.0"
+syn = "2.0"
+typify = "0.4"
 
 [[bin]]
 name = "json-schema-catalog"
