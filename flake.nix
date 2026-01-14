@@ -39,7 +39,7 @@
           devShells.default = crateOutputs.devShell.overrideAttrs (prevAttrs: {
             nativeBuildInputs = prevAttrs.nativeBuildInputs;
             shellHook = ''
-              ${config.pre-commit.installationScript}
+              ${config.pre-commit.shellHook}
             '';
           });
           # export the release package of the crate as default package
