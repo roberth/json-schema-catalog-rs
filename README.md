@@ -19,6 +19,30 @@ JSON Schema Catalog is not part of any standardization process, as far as I know
 JSON Schema Catalog was published in the [cp-framework-libraries](https://github.com/hmcts/cp-framework-libraries/tree/main?tab=readme-ov-file#json-schema-catalog) project (by the UK Govt, but this project is neither affiliated nor endorsed by them).
 Tea was consumed during this project's creation, fwiw.
 
+# Comparison with SchemaStore catalog
+
+[SchemaStore](https://www.schemastore.org) is a catalog in the broad sense of the word.
+It hosts numerous schemas, and it even includes a [`catalog.json`](https://www.schemastore.org/api/json/catalog.json) file, but this is not a true JSON Schema Catalog. If it did the same job, I would have gladly used it instead.
+
+- **Purpose**
+  - JSON Schema Catalog names schemas and locates them by mapping their **canonical URI** to a **location**.
+  - SchemaStore hosts schemas and provides a public directory of schema URIs, but no mapping.
+  - The SchemaStore catalog format names schemas and finds them by **instance** file name, primarily for use in editors.
+    It does not provide alternate locations.
+
+- **Name**
+  - JSON Schema Catalog is named after XML Catalog and models it closely. <!-- Technically the spec was titled XML Catalogs, plural -->
+  - SchemaStore refers to itself as "JSON Schema Catalog for Editors and Tools" in their website title. I interpret this as coinciding natural language, not a proper name.
+  - SchemaStore refers to itself as a catalog, but the SchemaStore catalog format lives at path `src/schemas/json/schema-catalog.json`, which could be confused for JSON Schema Catalog, but it is never referred to by that name.
+    > ```json
+    > "title": "JSON schema for SchemaStore.org catalog files"
+    > ```
+    
+    If they took "JSON Schema Catalog" as a technical term, it would have appeared here.
+
+So these are different formats with different names, and they can work together.
+For instance, you could generate a JSON Schema Catalog from the SchemaStore repository, so that its `schemastore.org` URIs resolve to local files, and the SchemaStore `catalog.json` could fill in the `name` field in the generated JSON Schema Catalog. Both catalogs could be preserved to make for a versatile package that is useful to both editors and offline tools or build processes.
+
 # CLI
 
 This crate provides a command line interface (CLI) for working with JSON Schema Catalogs.
