@@ -73,7 +73,7 @@
           nci.crates."json-schema-catalog-rs" = { };
 
           pre-commit.settings.hooks.rustfmt.enable = true;
-          pre-commit.settings.hooks.nixfmt-rfc-style.enable = true;
+          pre-commit.settings.hooks.nixfmt.enable = true;
         };
 
       flake.lib = {
