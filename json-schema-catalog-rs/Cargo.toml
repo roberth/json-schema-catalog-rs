@@ -24,14 +24,14 @@ xdg = "3.0"
 [lib]
 
 [build-dependencies]
-prettyplease = "0.2"
-# schemars 1.0+ not yet supported by typify 0.5 - it still uses 0.8
+prettyplease = "0.3"
+# schemars 1.0+ not yet supported by typify 0.8 - it still uses schemars 0.8
 # Migration guide: https://graham.cool/schemars/migrating/
 schemars = "0.8"
 serde_json = "1.0"
-syn = "2.0"
+syn = "3.0"
 # Changelog: https://github.com/oxidecomputer/typify/raw/refs/heads/main/CHANGELOG.adoc
-typify = "0.5"
+typify = "0.8"
 
 [[bin]]
 name = "json-schema-catalog"
